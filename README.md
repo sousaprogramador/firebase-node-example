@@ -43,7 +43,7 @@ This project uses the hexagonal architecture (also known as ports and adapters) 
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/sousaprogramador/firebase-node-example.git
    cd your-repo
    ```
 
