@@ -68,3 +68,16 @@ Compile the TypeScript code:
 ```sh
 npm run build
 ```
+
+```sh
+npm run serve
+```
+
+### Technologies
+
+- Node.js
+- TypeScript
+- Express
+- Firebase Realtime Database
+- Firebase Functions
+- bcrypt
