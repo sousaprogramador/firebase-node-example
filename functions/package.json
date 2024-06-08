@@ -1,5 +1,6 @@
 {
-  "name": "functions",
+  "name": "node-example-funcions",
+  "author": "Mateus Sousa<sousa.programador@gmail.com>",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
