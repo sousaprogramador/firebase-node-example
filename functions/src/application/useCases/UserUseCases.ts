@@ -1,26 +1,30 @@
-import { IUserService } from "../../interfaces/IUserService";
-import { User } from "../../domain/models/User";
+import { IUserService } from '../../domain/services/IUserService';
+import { User } from '../../domain/models/User';
 
 export class UserUseCases {
   constructor(private userService: IUserService) {}
 
-  createUser(user: User): Promise<void> {
-    return this.userService.createUser(user);
+  async createUser(user: User): Promise<void> {
+    await this.userService.createUser(user);
   }
 
-  getUserById(id: string): Promise<User | null> {
-    return this.userService.getUserById(id);
+  async getUserById(id: string): Promise<User | null> {
+    return await this.userService.getUserById(id);
   }
 
-  updateUser(id: string, user: User): Promise<void> {
-    return this.userService.updateUser(id, user);
+  async updateUser(id: string, user: User): Promise<void> {
+    await this.userService.updateUser(id, user);
   }
 
-  deleteUser(id: string): Promise<void> {
-    return this.userService.deleteUser(id);
+  async deleteUser(id: string): Promise<void> {
+    await this.userService.deleteUser(id);
   }
 
-  getAllUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
+  async getAllUsers(): Promise<User[]> {
+    return await this.userService.getAllUsers();
+  }
+
+  async updatePhoto(userId: string, photoURL: string): Promise<void> {
+    await this.userService.updatePhoto(userId, photoURL);
   }
 }

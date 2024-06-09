@@ -1,32 +1,22 @@
 import { Request, Response } from 'express';
 import { UserUseCases } from '../../application/useCases/UserUseCases';
-import { User } from '../../domain/models/User';
 
 export class UserController {
   constructor(private userUseCases: UserUseCases) {}
 
-  createUser = async (req: Request, res: Response): Promise<void> => {
-    const user: User = req.body;
+  async createUser(req: Request, res: Response): Promise<void> {
     try {
-      await this.userUseCases.createUser(user);
+      await this.userUseCases.createUser(req.body);
       res.status(201).send('User created successfully');
     } catch (error) {
-      if ((error as Error).message === 'Email already exists') {
-        res.status(400).send('Email already exists');
-      } else {
-        res
-          .status(500)
-          .send('Error creating user: ' + (error as Error).message);
-      }
+      res.status(500).send('Error creating user: ' + (error as Error).message);
     }
-  };
+  }
 
-  getUserById = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params.id;
+  async getUserById(req: Request, res: Response): Promise<void> {
     try {
-      const user = await this.userUseCases.getUserById(userId);
+      const user = await this.userUseCases.getUserById(req.params.id);
       if (user) {
-        delete user.password; // Remove o campo de senha antes de enviar a resposta
         res.status(200).send(user);
       } else {
         res.status(404).send('User not found');
@@ -34,46 +24,44 @@ export class UserController {
     } catch (error) {
       res.status(500).send('Error getting user: ' + (error as Error).message);
     }
-  };
+  }
 
-  updateUser = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params.id;
-    const updatedUser: User = req.body;
+  async updateUser(req: Request, res: Response): Promise<void> {
     try {
-      await this.userUseCases.updateUser(userId, updatedUser);
+      await this.userUseCases.updateUser(req.params.id, req.body);
       res.status(200).send('User updated successfully');
     } catch (error) {
-      if ((error as Error).message === 'Email already exists') {
-        res.status(400).send('Email already exists');
-      } else {
-        res
-          .status(500)
-          .send('Error updating user: ' + (error as Error).message);
-      }
+      res.status(500).send('Error updating user: ' + (error as Error).message);
     }
-  };
+  }
 
-  deleteUser = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params.id;
+  async deleteUser(req: Request, res: Response): Promise<void> {
     try {
-      await this.userUseCases.deleteUser(userId);
+      await this.userUseCases.deleteUser(req.params.id);
       res.status(200).send('User deleted successfully');
     } catch (error) {
       res.status(500).send('Error deleting user: ' + (error as Error).message);
     }
-  };
+  }
 
-  getAllUsers = async (req: Request, res: Response): Promise<void> => {
+  async getAllUsers(req: Request, res: Response): Promise<void> {
     try {
       const users = await this.userUseCases.getAllUsers();
-      // Remove o campo de senha de cada usuário antes de enviar a resposta
-      const usersWithoutPasswords = users.map((user) => {
-        delete user.password;
-        return user;
-      });
-      res.status(200).send(usersWithoutPasswords);
+      res.status(200).send(users);
     } catch (error) {
-      res.status(500).send('Error listing users: ' + (error as Error).message);
+      res.status(500).send('Error getting users: ' + (error as Error).message);
     }
-  };
+  }
+
+  async updatePhoto(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId, photoURL } = req.body;
+      await this.userUseCases.updatePhoto(userId, photoURL);
+      res.status(200).send('User photo updated successfully');
+    } catch (error) {
+      res
+        .status(500)
+        .send('Error updating user photo: ' + (error as Error).message);
+    }
+  }
 }

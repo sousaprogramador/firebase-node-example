@@ -1,23 +1,28 @@
-import express from "express";
-import { FirebaseUserService } from "../../adapters/services/FirebaseUserService";
-import { UserUseCases } from "../../application/useCases/UserUseCases";
-import { UserController } from "../../adapters/controllers/UserController";
+import express from 'express';
+import { AuthController } from '../../adapters/controllers/AuthController';
+import { UserController } from '../../adapters/controllers/UserController';
+import { AuthUseCases } from '../../application/useCases/AuthUseCases';
+import { UserUseCases } from '../../application/useCases/UserUseCases';
+import { AuthService } from '../../adapters/services/AuthService';
+import { FirebaseUserService } from '../../adapters/services/FirebaseUserService';
+
+const authService = new AuthService();
+const userService = new FirebaseUserService();
+const authUseCases = new AuthUseCases(authService);
+const userUseCases = new UserUseCases(userService);
+const authController = new AuthController(authUseCases);
+const userController = new UserController(userUseCases);
 
 const app = express();
 app.use(express.json());
 
-const userService = new FirebaseUserService();
-const userUseCases = new UserUseCases(userService);
-const userController = new UserController(userUseCases);
+app.post('/register', (req, res) => authController.register(req, res));
+app.post('/login', (req, res) => authController.login(req, res));
+app.post('/users', (req, res) => userController.createUser(req, res));
+app.get('/users/:id', (req, res) => userController.getUserById(req, res));
+app.put('/users/:id', (req, res) => userController.updateUser(req, res));
+app.delete('/users/:id', (req, res) => userController.deleteUser(req, res));
+app.get('/users', (req, res) => userController.getAllUsers(req, res));
+app.post('/users/photo', (req, res) => userController.updatePhoto(req, res));
 
-app.post("/users", userController.createUser);
-app.get("/users", userController.getAllUsers);
-app.get("/users/:id", userController.getUserById);
-app.put("/users/:id", userController.updateUser);
-app.delete("/users/:id", userController.deleteUser);
-
-app.use((req, res) => {
-  res.status(404).send("Not Found");
-});
-
-export default app;
+export { app };

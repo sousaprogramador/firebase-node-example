@@ -1,6 +1,6 @@
-import { IUserService } from '../../interfaces/IUserService';
+import { IUserService } from '../../domain/services/IUserService';
 import { User } from '../../domain/models/User';
-import { db } from '../../config/firebaseConfig';
+import { db, auth, storage } from '../../config/firebaseConfig';
 import * as bcrypt from 'bcrypt';
 
 export class FirebaseUserService implements IUserService {
@@ -11,14 +11,19 @@ export class FirebaseUserService implements IUserService {
       throw new Error('Email already exists');
     }
 
-    const newUserRef = usersRef.doc();
-    user.id = newUserRef.id;
-
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(user.password!, saltRounds); // O uso de "!" garante que o TypeScript saiba que "password" não é nulo ou indefinido aqui
+    const hashedPassword = await bcrypt.hash(user.password!, saltRounds);
+
+    const userRecord = await auth.createUser({
+      email: user.email,
+      password: user.password,
+      displayName: user.name,
+    });
+
+    user.id = userRecord.uid;
     user.password = hashedPassword;
 
-    await newUserRef.set({ ...user });
+    await usersRef.doc(user.id).set(user);
   }
 
   async getUserById(id: string): Promise<User | null> {
@@ -57,6 +62,7 @@ export class FirebaseUserService implements IUserService {
   }
 
   async deleteUser(id: string): Promise<void> {
+    await auth.deleteUser(id);
     await db.collection('users').doc(id).delete();
   }
 
@@ -68,5 +74,9 @@ export class FirebaseUserService implements IUserService {
       return user;
     });
     return users;
+  }
+
+  async updatePhoto(userId: string, photoURL: string): Promise<void> {
+    await db.collection('users').doc(userId).update({ photoURL });
   }
 }
