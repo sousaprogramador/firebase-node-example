@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const serviceAccount = require('../private.key.json');
+const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS!);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
